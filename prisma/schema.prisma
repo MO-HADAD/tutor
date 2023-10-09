@@ -1,0 +1,114 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String @unique
+  password  String
+}
+
+model Client {
+  id           String          @id @default(uuid())
+  firstName    String
+  lastName     String
+  email        String          @unique
+  password     String
+  phone        String          @unique
+  coverImage   String
+  photo        String
+  country      String
+  firstMeeting Boolean
+  topics       ClientTopics[]
+  sessions     clientSession[]
+}
+
+model Instructor {
+  id            String             @id @default(uuid())
+  NID_Verified  Boolean            @default(false)
+  photo         String
+  coverImage    String
+  jobTItle      String
+  bio           String
+  country       String
+  experience    String?
+  hourlyRate    Float
+  paidBalance   Float
+  unPaidBalance Float
+  availability  Boolean            @default(true)
+  freeSession   Boolean            @default(false)
+  discount      Float?
+  rating        Float              @default(0.0)
+  topics        InstructorTopics[]
+  sessions      Session[]
+  bookedSlots   BookedSlot[]
+}
+
+model Topic {
+  id          String             @id @default(uuid())
+  name        String             @unique
+  clients     ClientTopics[]
+  instructors InstructorTopics[]
+}
+
+model ClientTopics {
+  client   Client @relation(fields: [clientId], references: [id])
+  clientId String
+  topic    Topic  @relation(fields: [topicId], references: [id])
+  topicId  String
+
+  @@id([clientId, topicId])
+}
+
+model InstructorTopics {
+  instructor   Instructor @relation(fields: [instructorId], references: [id])
+  instructorId String
+  topic        Topic      @relation(fields: [topicId], references: [id])
+  topicId      String
+
+  @@id([instructorId, topicId])
+}
+
+model Session {
+  id           String          @id @default(uuid())
+  title        String
+  delivered    Boolean
+  capacity     Int
+  startTime    DateTime
+  endTime      DateTime
+  instructor   Instructor      @relation(fields: [instructorId], references: [id])
+  instructorId String
+  clients      clientSession[]
+  bookedSlots  BookedSlot[]
+}
+
+model clientSession {
+  client    Client  @relation(fields: [clientId], references: [id])
+  clientId  String
+  session   Session @relation(fields: [sessionId], references: [id])
+  sessionId String
+
+  @@id([clientId, sessionId])
+}
+
+model BookedSlot {
+  id           String     @id @default(uuid())
+  startTime    DateTime
+  endTime      DateTime
+  rate         Float
+  order        Int
+  instructor   Instructor @relation(fields: [instructorId], references: [id])
+  instructorId String
+  session      Session    @relation(fields: [sessionId], references: [id])
+  sessionId    String
+}
