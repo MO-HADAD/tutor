@@ -4,6 +4,8 @@ import {
   // forgetPassword,
   register,
   signIn,
+  forgotPassword,
+  resetPassword
 } from '../controllers/authController.js';
 
 // Router App
@@ -18,9 +20,10 @@ router.post('/register', register);
 router.post('/signin', signIn);
 
 // Forget Password
-// router.get('/forget-password', forgetPassword);
+router.post('/forgot-password', forgotPassword);
+
 
 // // Reset Password
-// router.get('/resetPassword/:reset-token');
+router.post('/reset-password', resetPassword);
 // Router Expors
 export default router;

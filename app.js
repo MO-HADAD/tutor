@@ -6,6 +6,8 @@ import morgan from 'morgan';
 // Router Imports
 import adminRouter from './routers/adminRouter.js';
 import clientRouter from './routers/clientRouter.js';
+import authRouter from './routers/authRouter.js';
+
 // Controllers Imports
 import globalErrorHandler from './controllers/errorController.js';
 
@@ -25,6 +27,8 @@ if (process.env.NODE_ENV === 'development') {
 // Routers
 app.use('/api/admin', adminRouter);
 app.use('/api/client', clientRouter);
+app.use('/auth', authRouter);
+
 // Not Found Router
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
