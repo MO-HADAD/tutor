@@ -29,6 +29,9 @@ model Client {
   photo        String
   country      String
   firstMeeting Boolean
+  resetToken  String     @default("")
+
+  resetTokenExpires DateTime @default(now())
   topics       ClientTopics[]
   sessions     clientSession[]
 }

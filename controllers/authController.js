@@ -1,16 +1,17 @@
 import jwt from 'jsonwebtoken';
 import { promisify } from 'util';
 
+import prisma from '../utils/prismaClient.js';
+
 import catchAsync from '../utils/catchAsync.js';
 import AppError from '../utils/appError.js';
 import Response from '../utils/response.js';
-import User from '../models/userModel.js';
-import Cart from '../models/cartModel.js';
 
-const bcrypt = require('bcrypt');
-const { generateResetToken } = require('../utils/token');
-const transporter = require('../utils/email');
 
+import bcrypt from 'bcrypt';
+import  generateResetToken  from '../utils/token.js';
+import transporter from '../utils/email.js';
+  
 // Register new User
 export const register = catchAsync(async (req, res, next) => {
   // Extract Data from requst
@@ -202,9 +203,9 @@ const assingCartToUser = uId => {
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    const user = await prisma.user.findUnique({ where: { email } });
+    const client = await prisma.Client.findUnique({ where: { email } });
 
-    if (!user) {
+    if (!client) {
       return res.status(404).json({ error: 'User not found' });
     }
 
@@ -212,8 +213,8 @@ export const forgotPassword = async (req, res) => {
     const resetToken = generateResetToken();
 
     // Store the reset token and its expiration time in the database (Prisma)
-    await prisma.user.update({
-      where: { id: user.id },
+    await prisma.Client.update({
+      where: { id: client.id },
       data: {
         resetToken,
         resetTokenExpires: new Date(Date.now() + 3600000), // Token expires in 1 hour
@@ -222,7 +223,7 @@ export const forgotPassword = async (req, res) => {
 
     // Send an email to the user with the reset token
     const mailOptions = {
-      from: 'your-email@gmail.com',
+      from: 'mohamedel7dad2020@gmail.com',
       to: email,
       subject: 'Password Reset',
       text: `Your password reset token is: ${resetToken}`,
@@ -247,15 +248,15 @@ export const forgotPassword = async (req, res) => {
 export const resetPassword = async (req, res) => {
   try {
     const { email, resetToken, newPassword } = req.body;
-    const user = await prisma.user.findUnique({ where: { email } });
+    const client = await prisma.Client.findUnique({ where: { email } });
 
-    if (!user) {
+    if (!client) {
       return res.status(404).json({ error: 'User not found' });
     }
 
     if (
-      user.resetToken !== resetToken ||
-      user.resetTokenExpires < new Date()
+      client.resetToken !== resetToken ||
+      client.resetTokenExpires < new Date()
     ) {
       return res.status(400).json({ error: 'Invalid or expired reset token' });
     }
@@ -263,8 +264,8 @@ export const resetPassword = async (req, res) => {
     // Update the user's password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    await prisma.user.update({
-      where: { id: user.id },
+    await prisma.Client.update({
+      where: { id: client.id },
       data: {
         password: hashedPassword,
         resetToken: null, // Clear the reset token

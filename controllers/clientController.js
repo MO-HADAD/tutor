@@ -6,7 +6,7 @@ import prisma from '../utils/prismaClient.js';
 import { createAdminValidation } from '../validations/adminValidation.js'
 
 export const createClient = catchAsync(async (req,res)=>{
-    const {firstName, lastName,email,password,phone,coverImage,photo,country,firstMeeting,topics,sessions}
+    const {firstName, lastName,email,password,phone,coverImage,photo,country,firstMeeting,topics,sessions,resetToken,resetTokenExpires}
      = req.body;
      const { error, value } = createAdminValidation.validate({
         firstName,
@@ -30,7 +30,9 @@ export const createClient = catchAsync(async (req,res)=>{
              country,
              firstMeeting,
              topics,
-             sessions
+             sessions,
+             resetToken,
+             resetTokenExpires
         }
       })
       Response(res, 'Client Created.', 201, newClient);
@@ -77,6 +79,8 @@ export const updateClient = catchAsync(async (req, res) => {
     firstMeeting,
     topics,
     sessions,
+    resetToken,
+    resetTokenExpires
   } = req.body;
 
 const { error, value } = createAdminValidation.validate({
@@ -105,6 +109,8 @@ const { error, value } = createAdminValidation.validate({
         firstMeeting,
         topics,
         sessions,
+        resetToken,
+        resetTokenExpires
       },
     });
     Response(res, 'Client Updated.', 200, updatedClient);
